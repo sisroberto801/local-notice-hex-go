@@ -48,6 +48,9 @@ go run main.go
 # Or build and run
 go build -o notice-app
 ./notice-app
+
+# Check if application is running
+ps aux | grep "go run\|main.go\|:8080" | grep -v grep
 ```
 
 ## API Documentation
