@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 
@@ -9,24 +10,24 @@ import (
 	"local-notice-hex-go/internal/infrastructure/http/handler"
 	"local-notice-hex-go/internal/infrastructure/http/router"
 	"local-notice-hex-go/internal/service/user"
+	"local-notice-hex-go/pkg/database"
 )
 
 func main() {
 	config := configs.LoadConfig()
 
-	db, err := config.ConnectDB()
+	dbConnector := database.NewPostgreSQLConnector()
+	db, err := dbConnector.Connect(context.Background(), config.DatabaseURL)
 	if err != nil {
 		log.Fatal("Failed to connect to database:", err)
 	}
 	defer db.Close()
 
 	userRepo := postgres.NewUserRepository(db)
-
 	userService := user.NewUserService(userRepo)
+	userHandler := handler.NewUserHandler(userService, userRepo, config.JWTSecret)
 
-	userHandler := handler.NewUserHandler(userService)
-
-	r := router.SetupRouter(userHandler)
+	r := router.SetupRouter(userHandler, config.JWTSecret)
 
 	log.Printf("Server starting on port %s", config.ServerPort)
 	if err := http.ListenAndServe(":"+config.ServerPort, r); err != nil {

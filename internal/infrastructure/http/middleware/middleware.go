@@ -29,7 +29,7 @@ func SwaggerHandler() gin.HandlerFunc {
 	}
 }
 
-func JWTAuth() gin.HandlerFunc {
+func JWTAuth(secret string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
@@ -44,7 +44,7 @@ func JWTAuth() gin.HandlerFunc {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, jwt.ErrSignatureInvalid
 			}
-			return []byte("your-secret-key"), nil // Reemplaza con tu clave secreta
+			return []byte(secret), nil
 		})
 
 		if err != nil || !token.Valid {

@@ -54,3 +54,8 @@ go.work
 
 # Generated files
 go.sum
+
+# Environment variables
+.env
+.env.local
+.env.*.local

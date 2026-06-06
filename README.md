@@ -21,10 +21,14 @@ local-notice-hex-go/
 │       │   └── postgres/          # PostgreSQL repository
 │       └── http/                  # HTTP layer
 │           ├── handler/           # HTTP handlers
+│           ├── middleware/        # HTTP middleware
 │           └── router/            # HTTP router setup
 ├── migrations/                     # Database migrations
-├── swagger-ui/                    # API documentation
-└── pkg/                          # Public packages
+├── pkg/                          # Public packages
+│   ├── auth/                     # Authentication utilities
+│   ├── database/                 # Database utilities
+│   └── migration/                # Migration utilities
+└── swagger-ui/                    # API documentation
 ```
 
 ### Architecture Flow:
@@ -39,6 +43,9 @@ local-notice-hex-go/
 # Create database
 createdb notice_db
 
+# Copy environment file
+cp .env.example .env
+
 # Install dependencies
 go mod download
 
@@ -52,6 +59,25 @@ go build -o notice-app
 # Check if application is running
 ps aux | grep "go run\|main.go\|:8080" | grep -v grep
 ```
+
+## Environment Configuration
+
+The application uses a `.env` file for configuration:
+
+1. **Copy the template**:
+   ```bash
+   cp .env.example .env
+   ```
+
+2. **Edit `.env`** with your configuration:
+   ```env
+   SERVER_PORT=8080
+   DATABASE_URL=postgres://postgres:postgres@localhost:5432/notice_db?sslmode=disable
+   JWT_SECRET=your-secret-key
+   ENVIRONMENT=development
+   ```
+
+3. **Security Note**: Change `JWT_SECRET` in production to a secure, random string.
 
 ## API Documentation
 

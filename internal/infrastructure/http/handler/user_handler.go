@@ -2,12 +2,9 @@ package handler
 
 import (
 	userdomain "local-notice-hex-go/internal/domain/user"
-	"local-notice-hex-go/internal/infrastructure/database/postgres"
 	userservice "local-notice-hex-go/internal/service/user"
 	"net/http"
 	"strconv"
-
-	"local-notice-hex-go/configs"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -16,11 +13,17 @@ import (
 )
 
 type UserHandler struct {
-	service userservice.Service
+	service  userservice.Service
+	userRepo userdomain.Repository
+	jwtSecret string
 }
 
-func NewUserHandler(service userservice.Service) *UserHandler {
-	return &UserHandler{service: service}
+func NewUserHandler(service userservice.Service, userRepo userdomain.Repository, jwtSecret string) *UserHandler {
+	return &UserHandler{
+		service:  service,
+		userRepo: userRepo,
+		jwtSecret: jwtSecret,
+	}
 }
 
 func (h *UserHandler) Create(c *gin.Context) {
@@ -119,7 +122,7 @@ func (h *UserHandler) Delete(c *gin.Context) {
 	c.JSON(http.StatusNoContent, nil)
 }
 
-func Login(c *gin.Context) {
+func (h *UserHandler) Login(c *gin.Context) {
 	var req struct {
 		Username string `json:"username" validate:"required"`
 		Password string `json:"password" validate:"required"`
@@ -130,17 +133,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	config := configs.LoadConfig()
-
-	db, err := config.ConnectDB()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database connection failed"})
-		return
-	}
-	defer db.Close()
-
-	userRepo := postgres.NewUserRepository(db)
-	user, err := userRepo.FindByUsername(c.Request.Context(), req.Username)
+	user, err := h.userRepo.FindByUsername(c.Request.Context(), req.Username)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
 		return
@@ -157,7 +150,7 @@ func Login(c *gin.Context) {
 		"exp":      time.Now().Add(5 * time.Hour).Unix(),
 	})
 
-	tokenString, err := token.SignedString([]byte(config.JWTSecret))
+	tokenString, err := token.SignedString([]byte(h.jwtSecret))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
 		return

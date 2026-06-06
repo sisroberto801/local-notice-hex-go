@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRouter(userHandler *handler.UserHandler) *gin.Engine {
+func SetupRouter(userHandler *handler.UserHandler, jwtSecret string) *gin.Engine {
 	r := gin.Default()
 
 	r.Use(middleware.CORS())
@@ -22,14 +22,14 @@ func SetupRouter(userHandler *handler.UserHandler) *gin.Engine {
 		api.GET("/users/:id", userHandler.GetByID)
 
 		protected := api.Group("/")
-		protected.Use(middleware.JWTAuth())
+		protected.Use(middleware.JWTAuth(jwtSecret))
 		{
 			protected.GET("/users", userHandler.GetAll)
 			protected.PUT("/users/:id", userHandler.Update)
 			protected.DELETE("/users/:id", userHandler.Delete)
 		}
 
-		api.POST("/auth/login", handler.Login)
+		api.POST("/auth/login", userHandler.Login)
 	}
 
 	return r
