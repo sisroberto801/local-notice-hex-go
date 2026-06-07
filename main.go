@@ -16,7 +16,7 @@ import (
 func main() {
 	config := configs.LoadConfig()
 
-	dbConnector := database.NewPostgreSQLConnector()
+	dbConnector := database.NewSqlConnector()
 	db, err := dbConnector.Connect(context.Background(), config.DatabaseURL)
 	if err != nil {
 		log.Fatal("Failed to connect to database:", err)

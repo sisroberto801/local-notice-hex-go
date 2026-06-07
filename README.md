@@ -2,6 +2,15 @@
 
 **Repository:** https://github.com/sisroberto801/local-notice-hex-go.git
 
+## Technology Stack
+
+- **Go** - Programming language
+- **Gin** - HTTP web framework
+- **PostgreSQL** - Database
+- **JWT** - Authentication (using golang-jwt/jwt/v5)
+- **GORM** - ORM for database operations
+- **Swagger** - API documentation
+
 ## Hexagonal Architecture
 
 The project follows a hexagonal (clean architecture) with the following layers:
@@ -14,28 +23,36 @@ local-notice-hex-go/
 ├── internal/                      # Internal application code
 │   ├── domain/                    # Domain layer (core)
 │   │   └── user/                  # User domain entities and ports
+│   │       ├── user.go            # User entity and DTOs
+│   │       └── repository.go      # Repository interface
 │   ├── service/                   # Application services
 │   │   └── user/                  # User service implementations
+│   │       └── service.go         # User service logic
 │   └── infrastructure/            # Infrastructure layer
 │       ├── database/              # Database implementations
 │       │   └── postgres/          # PostgreSQL repository
+│       │       └── repository.go  # User repository implementation
 │       └── http/                  # HTTP layer
 │           ├── handler/           # HTTP handlers
+│           │   └── user_handler.go # User HTTP handlers
 │           ├── middleware/        # HTTP middleware
+│           │   └── middleware.go  # JWT and CORS middleware
 │           └── router/            # HTTP router setup
+│               └── router.go      # Route configuration
 ├── migrations/                     # Database migrations
 ├── pkg/                          # Public packages
-│   ├── auth/                     # Authentication utilities
 │   ├── database/                 # Database utilities
+│   │   └── database.go           # PostgreSQL connector
 │   └── migration/                # Migration utilities
+│       └── migrator.go           # Database migrator
 └── swagger-ui/                    # API documentation
 ```
 
 ### Architecture Flow:
-1. **Controller** receives HTTP requests
-2. **Service** coordinates use cases
-3. **Domain** contains pure business logic
-4. **Infrastructure** implements technical details (DB, external APIs)
+1. **Controller/Handler** receives HTTP requests
+2. **Service** coordinates use cases and business logic
+3. **Domain** contains pure business entities and interfaces
+4. **Infrastructure** implements technical details (DB, HTTP handlers)
 
 ## Run Application
 
@@ -94,17 +111,28 @@ The Swagger documentation provides interactive API testing and detailed endpoint
 - `POST /api/auth/login` - User login and JWT token generation
 
 #### Users Management
-- `GET /api/users` - Get all users
-- `POST /api/users` - Create a new user
-- `GET /api/users/{id}` - Get user by ID
-- `PUT /api/users/{id}` - Update user
-- `DELETE /api/users/{id}` - Delete user
+- `POST /api/users` - Create a new user (public)
+- `GET /api/users/:id` - Get user by ID (public)
+- `GET /api/users` - Get all users (protected - JWT required)
+- `PUT /api/users/:id` - Update user (protected - JWT required)
+- `DELETE /api/users/:id` - Delete user (protected - JWT required)
 
-#### User Model
+#### User Models
+
+**User Request (Create/Update)**
+```json
+{
+  "username": "john_doe",
+  "password": "securepassword123",
+  "status": true
+}
+```
+
+**User Response**
 ```json
 {
   "id": 50,
-  "username": "s",
+  "username": "john_doe",
   "status": true,
   "createdAt": "2026-05-12T22:19:51.105964Z",
   "updatedAt": "2026-05-12T22:19:51.105984Z"
@@ -128,3 +156,14 @@ The application uses environment variables for configuration:
 - `DATABASE_URL`: PostgreSQL connection URL
 - `JWT_SECRET`: JWT secret key for authentication
 - `ENVIRONMENT`: Application environment (default: development)
+
+## Authentication
+
+The application uses JWT (JSON Web Tokens) for authentication:
+
+1. **Login**: POST `/api/auth/login` with username and password
+2. **Token**: Receive JWT token in response
+3. **Protected Routes**: Include JWT token in Authorization header: `Bearer <token>`
+4. **Token Validation**: Middleware validates JWT token for protected endpoints
+
+**Note**: The `pkg/auth` package exists but is currently not used. The application uses `jwt.MapClaims` directly in the middleware and handlers.

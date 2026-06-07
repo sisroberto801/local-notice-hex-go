@@ -10,12 +10,12 @@ type Connector interface {
 	Connect(ctx context.Context, databaseURL string) (*pgxpool.Pool, error)
 }
 
-type PostgreSQLConnector struct{}
+type SqlConnector struct{}
 
-func NewPostgreSQLConnector() Connector {
-	return &PostgreSQLConnector{}
+func NewSqlConnector() Connector {
+	return &SqlConnector{}
 }
 
-func (p *PostgreSQLConnector) Connect(ctx context.Context, databaseURL string) (*pgxpool.Pool, error) {
+func (p *SqlConnector) Connect(ctx context.Context, databaseURL string) (*pgxpool.Pool, error) {
 	return pgxpool.New(ctx, databaseURL)
 }
