@@ -11,6 +11,7 @@ import (
 	"local-notice-hex-go/internal/infrastructure/http/router"
 	"local-notice-hex-go/internal/service/user"
 	"local-notice-hex-go/pkg/database"
+	"local-notice-hex-go/pkg/migration"
 )
 
 func main() {
@@ -22,6 +23,12 @@ func main() {
 		log.Fatal("Failed to connect to database:", err)
 	}
 	defer db.Close()
+
+	// Run database migrations
+	migrator := migration.NewMigrator(db)
+	if err := migrator.Up(context.Background()); err != nil {
+		log.Fatal("Failed to run migrations:", err)
+	}
 
 	userRepo := postgres.NewUserRepository(db)
 	userService := user.NewUserService(userRepo)
