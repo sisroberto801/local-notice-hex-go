@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRouter(userHandler *handler.UserHandler, jwtSecret string) *gin.Engine {
+func SetupRouter(userHandler *handler.UserHandler, healthHandler *handler.HealthHandler, jwtSecret string) *gin.Engine {
 	r := gin.Default()
 
 	r.Use(middleware.CORS())
@@ -15,6 +15,10 @@ func SetupRouter(userHandler *handler.UserHandler, jwtSecret string) *gin.Engine
 
 	r.Static("/swagger-ui", "./swagger-ui")
 	r.GET("/swagger/*any", middleware.SwaggerHandler())
+
+	// Health check endpoints
+	r.GET("/health", healthHandler.Health)
+	r.GET("/ready", healthHandler.Ready)
 
 	api := r.Group("/api")
 	{

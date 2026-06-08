@@ -34,8 +34,9 @@ func main() {
 	userRepo := postgres.NewUserRepository(db)
 	userService := user.NewUserService(userRepo)
 	userHandler := handler.NewUserHandler(userService, config.JWTSecret)
+	healthHandler := handler.NewHealthHandler()
 
-	r := router.SetupRouter(userHandler, config.JWTSecret)
+	r := router.SetupRouter(userHandler, healthHandler, config.JWTSecret)
 
 	log.Printf("Server starting on port %s", config.ServerPort)
 	if err := http.ListenAndServe(":"+config.ServerPort, r); err != nil {
