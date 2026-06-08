@@ -2,7 +2,8 @@ package postgres
 
 import (
 	"context"
-	"local-notice-hex-go/internal/domain/user"
+	"local-notice-hex-go/internal/domain/model"
+	"local-notice-hex-go/internal/domain/ports"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -12,18 +13,18 @@ type UserRepository struct {
 	db *pgxpool.Pool
 }
 
-func NewUserRepository(db *pgxpool.Pool) user.Repository {
+func NewUserRepository(db *pgxpool.Pool) ports.UserRepositoryPort {
 	return &UserRepository{db: db}
 }
 
-func (r *UserRepository) Create(ctx context.Context, u *user.User) (*user.User, error) {
+func (r *UserRepository) Create(ctx context.Context, u *model.User) (*model.User, error) {
 	query := `
         INSERT INTO users (username, password, status, created_at, updated_at)
         VALUES ($1, $2, $3, $4, $5)
         RETURNING id, username, password, status, created_at, updated_at
     `
 
-	var createdUser user.User
+	var createdUser model.User
 	err := r.db.QueryRow(ctx, query,
 		u.Username, u.Password, u.Status, time.Now(), time.Now()).
 		Scan(&createdUser.ID, &createdUser.Username, &createdUser.Password,
@@ -36,14 +37,14 @@ func (r *UserRepository) Create(ctx context.Context, u *user.User) (*user.User, 
 	return &createdUser, nil
 }
 
-func (r *UserRepository) FindByID(ctx context.Context, id int64) (*user.User, error) {
+func (r *UserRepository) FindByID(ctx context.Context, id int64) (*model.User, error) {
 	query := `
         SELECT id, username, password, status, created_at, updated_at
         FROM users
         WHERE id = $1
     `
 
-	var u user.User
+	var u model.User
 	err := r.db.QueryRow(ctx, query, id).
 		Scan(&u.ID, &u.Username, &u.Password, &u.Status, &u.CreatedAt, &u.UpdatedAt)
 
@@ -54,14 +55,14 @@ func (r *UserRepository) FindByID(ctx context.Context, id int64) (*user.User, er
 	return &u, nil
 }
 
-func (r *UserRepository) FindByUsername(ctx context.Context, username string) (*user.User, error) {
+func (r *UserRepository) FindByUsername(ctx context.Context, username string) (*model.User, error) {
 	query := `
         SELECT id, username, password, status, created_at, updated_at
         FROM users
         WHERE username = $1
     `
 
-	var u user.User
+	var u model.User
 	err := r.db.QueryRow(ctx, query, username).
 		Scan(&u.ID, &u.Username, &u.Password, &u.Status, &u.CreatedAt, &u.UpdatedAt)
 
@@ -72,7 +73,7 @@ func (r *UserRepository) FindByUsername(ctx context.Context, username string) (*
 	return &u, nil
 }
 
-func (r *UserRepository) FindAll(ctx context.Context) ([]*user.User, error) {
+func (r *UserRepository) FindAll(ctx context.Context) ([]*model.User, error) {
 	query := `
         SELECT id, username, password, status, created_at, updated_at
         FROM users
@@ -85,9 +86,9 @@ func (r *UserRepository) FindAll(ctx context.Context) ([]*user.User, error) {
 	}
 	defer rows.Close()
 
-	var users []*user.User
+	var users []*model.User
 	for rows.Next() {
-		var u user.User
+		var u model.User
 		err := rows.Scan(&u.ID, &u.Username, &u.Password, &u.Status, &u.CreatedAt, &u.UpdatedAt)
 		if err != nil {
 			return nil, err
@@ -102,7 +103,7 @@ func (r *UserRepository) FindAll(ctx context.Context) ([]*user.User, error) {
 	return users, nil
 }
 
-func (r *UserRepository) Update(ctx context.Context, id int64, u *user.User) (*user.User, error) {
+func (r *UserRepository) Update(ctx context.Context, id int64, u *model.User) (*model.User, error) {
 	query := `
         UPDATE users
         SET username = $1, password = $2, status = $3, updated_at = $4
@@ -110,7 +111,7 @@ func (r *UserRepository) Update(ctx context.Context, id int64, u *user.User) (*u
         RETURNING id, username, password, status, created_at, updated_at
     `
 
-	var updatedUser user.User
+	var updatedUser model.User
 	err := r.db.QueryRow(ctx, query,
 		u.Username, u.Password, u.Status, time.Now(), id).
 		Scan(&updatedUser.ID, &updatedUser.Username, &updatedUser.Password,

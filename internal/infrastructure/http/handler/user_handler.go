@@ -1,7 +1,7 @@
 package handler
 
 import (
-	userdomain "local-notice-hex-go/internal/domain/user"
+	userdomain "local-notice-hex-go/internal/domain/model"
 	userservice "local-notice-hex-go/internal/service/user"
 	"net/http"
 	"strconv"
@@ -9,19 +9,16 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type UserHandler struct {
-	service  userservice.Service
-	userRepo userdomain.Repository
+	service   userservice.Service
 	jwtSecret string
 }
 
-func NewUserHandler(service userservice.Service, userRepo userdomain.Repository, jwtSecret string) *UserHandler {
+func NewUserHandler(service userservice.Service, jwtSecret string) *UserHandler {
 	return &UserHandler{
-		service:  service,
-		userRepo: userRepo,
+		service:   service,
 		jwtSecret: jwtSecret,
 	}
 }
@@ -133,13 +130,8 @@ func (h *UserHandler) Login(c *gin.Context) {
 		return
 	}
 
-	user, err := h.userRepo.FindByUsername(c.Request.Context(), req.Username)
+	user, err := h.service.Login(c.Request.Context(), req.Username, req.Password)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
-		return
-	}
-
-	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
 		return
 	}

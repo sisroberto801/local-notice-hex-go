@@ -20,19 +20,20 @@ func main() {
 	dbConnector := database.NewSqlConnector()
 	db, err := dbConnector.Connect(context.Background(), config.DatabaseURL)
 	if err != nil {
+
 		log.Fatal("Failed to connect to database:", err)
 	}
 	defer db.Close()
 
-	// Run database migrations
 	migrator := migration.NewMigrator(db)
 	if err := migrator.Up(context.Background()); err != nil {
+
 		log.Fatal("Failed to run migrations:", err)
 	}
 
 	userRepo := postgres.NewUserRepository(db)
 	userService := user.NewUserService(userRepo)
-	userHandler := handler.NewUserHandler(userService, userRepo, config.JWTSecret)
+	userHandler := handler.NewUserHandler(userService, config.JWTSecret)
 
 	r := router.SetupRouter(userHandler, config.JWTSecret)
 
