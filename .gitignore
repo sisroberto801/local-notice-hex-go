@@ -52,9 +52,6 @@ build/
 # Go workspace file
 go.work
 
-# Generated files
-# go.sum - REMOVED: needed for GCP builds
-
 # Environment variables
 .env
 .env.local

@@ -2,6 +2,22 @@
 
 **Repository:** https://github.com/sisroberto801/local-notice-hex-go.git
 
+## Quick Start
+
+```bash
+# Create database
+createdb notice_db
+
+# Setup environment
+cp .env.example .env
+
+# Install dependencies
+go mod download
+
+# Run the application
+go run main.go
+```
+
 ## Technology Stack
 
 - **Go** - Programming language
@@ -65,26 +81,7 @@ local-notice-hex-go/
 
 ### Local Development
 
-```bash
-# Create database
-createdb notice_db
-
-# Copy environment file
-cp .env.example .env
-
-# Install dependencies
-go mod download
-
-# Run the application
-go run main.go
-
-# Or build and run
-go build -o notice-app
-./notice-app
-
-# Check if application is running
-ps aux | grep "go run\|main.go\|:8080" | grep -v grep
-```
+For detailed setup, see the Quick Start section above.
 
 ### Docker Development
 
@@ -156,79 +153,20 @@ The application uses a `.env` file for configuration:
 
 ## API Documentation
 
-Once the application is running, you can access the Swagger UI at:
-
 - **Swagger UI**: http://localhost:8080/swagger-ui/
-- **OpenAPI Info**: http://localhost:8080/swagger-ui/project.swagger.yaml
+- **OpenAPI Spec**: http://localhost:8080/swagger-ui/project.swagger.yaml
 
-The Swagger documentation provides interactive API testing and detailed endpoint information.
+### Key Endpoints
 
-### REST Endpoints
+- `GET /health` - Health check
+- `GET /ready` - Readiness check  
+- `POST /api/auth/login` - User login
+- `GET /api/users` - List users (protected)
+- `POST /api/users` - Create user
+- `GET /api/users/:id` - Get user by ID
+- `PUT /api/users/:id` - Update user (protected)
+- `DELETE /api/users/:id` - Delete user (protected)
 
-#### Health Check
-- `GET /health` - Application health status
-- `GET /ready` - Application readiness status
-
-#### Authentication
-- `POST /api/auth/login` - User login and JWT token generation
-
-#### Users Management
-- `POST /api/users` - Create a new user (public)
-- `GET /api/users/:id` - Get user by ID (public)
-- `GET /api/users` - Get all users (protected - JWT required)
-- `PUT /api/users/:id` - Update user (protected - JWT required)
-- `DELETE /api/users/:id` - Delete user (protected - JWT required)
-
-#### User Models
-
-**User Request (Create/Update)**
-```json
-{
-  "username": "john_doe",
-  "password": "securepassword123",
-  "status": true
-}
-```
-
-**User Response**
-```json
-{
-  "id": 50,
-  "username": "john_doe",
-  "status": true,
-  "createdAt": "2026-05-12T22:19:51.105964Z",
-  "updatedAt": "2026-05-12T22:19:51.105984Z"
-}
-```
-
-## Database
-
-- PostgreSQL: `notice_db`
-- User: `postgres`
-- Password: `postgres`
-- Port: `5432`
-
-**Connection URL:** `postgres://postgres:postgres@localhost:5432/notice_db?sslmode=disable`
-
-## Configuration
-
-The application uses environment variables for configuration:
-
-### Server Configuration
-- `SERVER_PORT`: Server port (default: 8080)
-
-### Database Configuration
-- `POSTGRES_DB`: Database name (default: notice_db)
-- `POSTGRES_USER`: Database user (default: postgres)
-- `POSTGRES_PASSWORD`: Database password (default: postgres)
-- `POSTGRES_HOST`: Database host (default: localhost)
-- `POSTGRES_PORT`: Database port (default: 5432)
-- `POSTGRES_SSLMODE`: SSL mode (default: disable)
-- `DATABASE_URL`: PostgreSQL connection URL (auto-generated from above)
-
-### Application Configuration
-- `JWT_SECRET`: JWT secret key for authentication
-- `ENVIRONMENT`: Application environment (default: development)
 
 ## Authentication
 
