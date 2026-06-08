@@ -53,7 +53,7 @@ build/
 go.work
 
 # Generated files
-go.sum
+# go.sum - REMOVED: needed for GCP builds
 
 # Environment variables
 .env
