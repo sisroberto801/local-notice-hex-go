@@ -38,6 +38,9 @@ WORKDIR /app
 # Copy the binary from builder stage
 COPY --from=builder /app/main .
 
+# Make the binary executable
+RUN chmod +x ./main
+
 # Copy swagger-ui files from builder stage
 COPY --from=builder /app/swagger-ui ./swagger-ui/
 
@@ -50,9 +53,7 @@ USER appuser
 # Expose port (Cloud Run expects port 8080)
 EXPOSE 8080
 
-# Health check for Cloud Run
-HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8080/health || exit 1
+# Health check removed temporarily for troubleshooting
 
 # Run the binary
 CMD ["./main"]
