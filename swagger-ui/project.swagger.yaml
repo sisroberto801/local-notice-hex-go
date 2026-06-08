@@ -11,10 +11,8 @@ info:
     url: https://opensource.org/licenses/MIT
 
 servers:
-  - url: http://localhost:8080
-    description: Development server
-  - url: https://api.hexagonal-notice.com
-    description: Production server
+  - url: /
+    description: Current server (dynamic)
 
 tags:
   - name: Authentication
