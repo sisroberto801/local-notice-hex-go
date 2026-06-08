@@ -22,16 +22,17 @@ local-notice-hex-go/
 │   └── config.go                  # Application configuration
 ├── internal/                      # Internal application code
 │   ├── domain/                    # Domain layer (core)
-│   │   └── user/                  # User domain entities and ports
-│   │       ├── user.go            # User entity and DTOs
-│   │       └── repository.go      # Repository interface
+│   │   ├── model/                 # Domain entities
+│   │   │   └── user.go           # User entity and DTOs
+│   │   └── ports/                 # Domain interfaces
+│   │       └── user_repository_port.go # Repository interface
 │   ├── service/                   # Application services
 │   │   └── user/                  # User service implementations
 │   │       └── service.go         # User service logic
 │   └── infrastructure/            # Infrastructure layer
 │       ├── database/              # Database implementations
 │       │   └── postgres/          # PostgreSQL repository
-│       │       └── repository.go  # User repository implementation
+│       │       └── user_repository_adapter.go # User repository implementation
 │       └── http/                  # HTTP layer
 │           ├── handler/           # HTTP handlers
 │           │   └── user_handler.go # User HTTP handlers
@@ -39,13 +40,15 @@ local-notice-hex-go/
 │           │   └── middleware.go  # JWT and CORS middleware
 │           └── router/            # HTTP router setup
 │               └── router.go      # Route configuration
-├── migrations/                     # Database migrations
 ├── pkg/                          # Public packages
 │   ├── database/                 # Database utilities
 │   │   └── database.go           # PostgreSQL connector
 │   └── migration/                # Migration utilities
+│       ├── 001_create_users_table.sql # Database migration file
 │       └── migrator.go           # Database migrator
 └── swagger-ui/                    # API documentation
+    ├── index.html                 # Swagger UI interface
+    └── project.swagger.yaml      # OpenAPI specification
 ```
 
 ### Architecture Flow:
