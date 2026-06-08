@@ -129,7 +129,7 @@ The application uses a `.env` file for configuration:
 2. **Edit `.env`** with your configuration:
    ```env
    # Server Configuration
-   SERVER_PORT=8080
+   PORT=8080
 
    # PostgreSQL Configuration (base variables)
    POSTGRES_DB=notice_db
@@ -203,7 +203,7 @@ gcloud run deploy local-notice-hex-go \
   --platform managed \
   --region [REGION] \
   --allow-unauthenticated \
-  --set-env-vars "SERVER_PORT=8080" \
+  --set-env-vars "PORT=8080" \
   --set-env-vars "POSTGRES_HOST=[CLOUD_SQL_INSTANCE_IP]" \
   --set-env-vars "POSTGRES_DB=notice_db" \
   --set-env-vars "POSTGRES_USER=postgres" \
@@ -233,6 +233,7 @@ Cloud Run automatically uses the `/health` endpoint for health checks with:
 ### Environment Variables for Production
 
 For production deployment, set these environment variables:
+- `PORT`: Cloud Run port (8080)
 - `POSTGRES_HOST`: Cloud SQL instance connection name
 - `POSTGRES_DB`: Database name
 - `POSTGRES_USER`: Database user
